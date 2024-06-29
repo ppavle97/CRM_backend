@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { User } from "../models";
 import {
   validateEmail,
   validateFullName,
   validatePassword,
-} from "../validators";
+} from "../../validators";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { User } from "../../models";
 
 export const registerUser = async (req: Request, res: Response) => {
   const { fullName, email, password } = req.body;
@@ -47,17 +47,17 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
+    const newUser = User.create({
       fullName,
       email,
       password: hashedPassword,
-    }).save();
+    });
 
-    await newUser.save();
+    const savedUser = await newUser.save();
 
     res
       .status(201)
-      .json({ message: "User registered successfully", user: newUser });
+      .json({ message: "User registered successfully", user: savedUser });
   } catch (error) {
     console.error("Error registering user:", error);
     res.status(500).json({ error: "Internal server error" });

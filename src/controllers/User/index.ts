@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { User } from "../models/User";
 import passport from "passport";
 import { getRepository } from "typeorm";
+import { User } from "../../models";
 
 export const getUsers = async (req: Request, res: Response) => {
   try {

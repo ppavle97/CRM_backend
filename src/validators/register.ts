@@ -1,5 +1,5 @@
 const validateFullName = (fullName: string): boolean => {
-  if (!fullName || fullName.length < 4) {
+  if (!fullName || fullName.length < 5 ) {
     return false;
   }
   return true;
