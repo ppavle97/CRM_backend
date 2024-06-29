@@ -31,23 +31,4 @@ export class User extends BaseEntity {
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   updated_at!: Date;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
-    if (this.password) {
-      if (!this.isPasswordValid()) {
-        throw new Error("Password does not meet requirements");
-      }
-      this.password = await bcrypt.hash(this.password, 10);
-    }
-  }
-
-  private isPasswordValid(): boolean {
-    return (
-      this.password.length >= 8 &&
-      /[a-zA-Z]/.test(this.password) &&
-      /\d/.test(this.password)
-    );
-  }
 }

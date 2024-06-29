@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: "*", methods: ["POST", "GET", "DELETE", "PUT"] }));
-app.use(bodyParser.json()); // Add this line for JSON parsing
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const router = express.Router();
 API(router);

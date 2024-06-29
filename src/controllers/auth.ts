@@ -5,6 +5,8 @@ import {
   validateFullName,
   validatePassword,
 } from "../validators";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 export const registerUser = async (req: Request, res: Response) => {
   const { fullName, email, password } = req.body;
@@ -43,12 +45,13 @@ export const registerUser = async (req: Request, res: Response) => {
         .json({ error: "User already exists with this email" });
     }
 
-    const newUser = new User();
-    newUser.fullName = fullName;
-    newUser.email = email;
-    newUser.password = password;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    await newUser.hashPassword();
+    const newUser = await User.create({
+      fullName,
+      email,
+      password: hashedPassword,
+    }).save();
 
     await newUser.save();
 
@@ -60,6 +63,46 @@ export const registerUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 export const loginUser = async (req: Request, res: Response) => {
-  res.send("Login logic");
+  const { email, password } = req.body;
+
+  try {
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        message: "Email must be in right format.",
+      });
+    }
+
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET as string,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    return res.status(200).json({ message: "Login successful", token });
+  } catch (error) {
+    console.error("Error during user login:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 };
