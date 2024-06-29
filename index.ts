@@ -11,13 +11,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: "*", methods: ["POST", "GET", "DELETE", "PUT"] }));
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // Add this line for JSON parsing
 
 const router = express.Router();
 API(router);
 
 connect()
   .then(() => {
+    app.use("/api", router);
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

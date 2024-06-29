@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Index, BeforeInsert, BeforeUpdate } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BaseEntity,
+  Index,
+  BeforeInsert,
+  BeforeUpdate,
+} from "typeorm";
 import { Length, IsEmail } from "class-validator";
 import bcrypt from "bcryptjs";
 
@@ -8,11 +16,11 @@ export class User extends BaseEntity {
   id!: number;
 
   @Column({ length: 25 })
-  @Length(5, 25) 
+  @Length(5, 25)
   fullName!: string;
 
   @Column({ unique: true, length: 255 })
-  @IsEmail() 
+  @IsEmail()
   email!: string;
 
   @Column({ length: 100 })
@@ -28,7 +36,18 @@ export class User extends BaseEntity {
   @BeforeUpdate()
   async hashPassword() {
     if (this.password) {
-      this.password = await bcrypt.hash(this.password, 10); 
+      if (!this.isPasswordValid()) {
+        throw new Error("Password does not meet requirements");
+      }
+      this.password = await bcrypt.hash(this.password, 10);
     }
+  }
+
+  private isPasswordValid(): boolean {
+    return (
+      this.password.length >= 8 &&
+      /[a-zA-Z]/.test(this.password) &&
+      /\d/.test(this.password)
+    );
   }
 }
