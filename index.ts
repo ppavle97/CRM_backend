@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import { connect } from "./config/db";
 
 dotenv.config();
 
@@ -13,6 +14,13 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello, this is a CRM backend app!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+connect()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to connect to database:", error);
+    process.exit(1);
+  });
