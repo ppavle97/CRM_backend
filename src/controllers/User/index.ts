@@ -32,10 +32,11 @@ export const getUser = async (req: Request, res: Response) => {
         const userRepository = getRepository(User);
         const userData = await userRepository.findOne({
           where: { id: user.id },
+          select: ["id", "fullName", "email", "created_at", "updated_at"], // Select fields to include
         });
 
-        if (!user) {
-          return res.status(401).send("Client not found");
+        if (!userData) {
+          return res.status(404).send("User not found");
         }
 
         return res.status(200).json({ status: 200, userData });

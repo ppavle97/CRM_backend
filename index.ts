@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: "*", methods: ["POST", "GET", "DELETE", "PUT"] }));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const passport = configurePassport();
 app.use(passport.initialize());

@@ -42,7 +42,7 @@ export const registerUser = async (req: Request, res: Response) => {
     if (existingUser) {
       return res
         .status(400)
-        .json({ error: "User already exists with this email" });
+        .json({ message: "User already exists with this email" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -66,7 +66,6 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
   try {
     if (!email || !password) {
       return res
